@@ -2,6 +2,7 @@
 // it. The page at #/ui (src/screens/UiPage.tsx) shows them all.
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import type { Scope } from "./scope";
+import { setTheme, useTheme } from "./theme";
 
 export const SCOPE_COLOUR: Record<Scope | "interpersonal", string> = {
   personal: "var(--personal)",
@@ -34,13 +35,36 @@ export function OptionCard({ label, hint, swatch, checked, onChoose }: { label: 
   );
 }
 
-export function Field({ id, label, value, placeholder, secret = false, error, onChange }: { id: string; label: string; value: string; placeholder?: string; secret?: boolean; error?: string | undefined; onChange: (value: string) => void }) {
+/** A text field. What it is for is written inside it and gives way to what is typed; `hint` adds an example after it. */
+export function Field({ id, label, value, hint, secret = false, error, onChange }: { id: string; label: string; value: string; /** An example, shown after the label while the field is empty. */ hint?: string; secret?: boolean; error?: string | undefined; onChange: (value: string) => void }) {
+  return (
+    <div className="field">
+      <input id={id} type={secret ? "password" : "text"} value={value} placeholder={hint ? `${label} · ${hint}` : label} aria-label={label} autoComplete="off" spellCheck={false}
+        aria-invalid={error ? true : undefined} onChange={(e) => onChange(e.target.value)} />
+      {error && <span className="error" role="alert">{error}</span>}
+    </div>
+  );
+}
+
+/** One of a short list, as a drop-down. */
+export function Select({ id, label, value, options, onChange }: { id: string; label: string; value: string; options: readonly string[]; onChange: (value: string) => void }) {
   return (
     <label className="field" htmlFor={id}>
       {label}
-      <input id={id} type={secret ? "password" : "text"} value={value} placeholder={placeholder} autoComplete="off" spellCheck={false}
-        aria-invalid={error ? true : undefined} onChange={(e) => onChange(e.target.value)} />
-      {error && <span className="error">{error}</span>}
+      <select id={id} value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </label>
+  );
+}
+
+/** A setting between two ends, 0 to 1 (how important, how close). The words at the ends say what they mean. */
+export function Slider({ id, label, value, low, high, onChange }: { id: string; label: string; value: number; low: string; high: string; onChange: (value: number) => void }) {
+  return (
+    <label className="field" htmlFor={id}>
+      {label}
+      <input id={id} type="range" min={0} max={100} step={5} value={Math.round(value * 100)} aria-valuetext={`${Math.round(value * 100)}%`} onChange={(e) => onChange(Number(e.target.value) / 100)} />
+      <span className="ends" aria-hidden="true"><span>{low}</span><span>{high}</span></span>
     </label>
   );
 }
@@ -65,6 +89,25 @@ export function AiButtons({ local, cloud, onLocal, onCloud }: { local: boolean; 
   );
 }
 
+/** The hamburger menu button of mosaicvillage.org's top bar: two bars that cross into an X while open. */
+export function MenuButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+  return (
+    <button type="button" className="menu-btn" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={onToggle}>
+      <span className="menu-icon"><span /><span /></span>
+    </button>
+  );
+}
+
+/** The light/dark pill switch of mosaicvillage.org's top bar. */
+export function ThemeToggle() {
+  const dark = useTheme() === "dark";
+  return (
+    <button type="button" role="switch" aria-checked={dark} className="theme-switch" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setTheme(dark ? "light" : "dark")}>
+      <span className="knob" />
+    </button>
+  );
+}
+
 export type StepState = "done" | "current" | "ahead";
 export function StepRail({ steps, onGo }: { steps: readonly { label: string; state: StepState }[]; onGo: (index: number) => void }) {
   return (
@@ -72,6 +115,22 @@ export function StepRail({ steps, onGo }: { steps: readonly { label: string; sta
       {steps.map((s, i) => (
         <button key={s.label} type="button" data-state={s.state} aria-current={s.state === "current" ? "step" : undefined} disabled={s.state === "ahead"} onClick={() => onGo(i)}>{s.label}</button>
       ))}
+    </nav>
+  );
+}
+
+/** The steps of a sequence as numbers in a row. The current one is filled; a finished one can be gone back to. */
+export function StepNumbers({ steps, onGo }: { steps: readonly { name: string; state: StepState }[]; onGo?: (index: number) => void }) {
+  return (
+    <nav className="steps" aria-label="Steps">
+      <ol>
+        {steps.map((s, i) => (
+          <li key={s.name}>
+            <button type="button" data-state={s.state} aria-current={s.state === "current" ? "step" : undefined} aria-label={`Step ${i + 1}: ${s.name}`} title={s.name}
+              disabled={s.state !== "done" || !onGo} onClick={() => onGo?.(i)}>{i + 1}</button>
+          </li>
+        ))}
+      </ol>
     </nav>
   );
 }
@@ -93,15 +152,20 @@ export function EngagementBars({ values }: { values: readonly ValueBars[] }) {
 }
 
 /** One line of the settings list: a connected folder, database or AI, with pause and remove. */
-export function ConnectionRow({ name, detail, scope, connected, colour, onToggle, onRemove }: { name: string; detail: string; scope: Scope; connected: boolean; /** Overrides the scope colour of the dot. */ colour?: string; onToggle?: () => void; onRemove?: () => void }) {
+export function ConnectionRow({ name, detail, scope, connected, paused = !connected, colour, onToggle, onRemove }: { name: string; detail: string; scope: Scope; connected: boolean; /** Not connected because the member paused it (rather than never set up). Unless said otherwise, any unconnected line counts as paused. */ paused?: boolean; /** Overrides the scope colour of the dot. */ colour?: string; onToggle?: () => void; onRemove?: () => void }) {
   return (
     <div className="connection" data-connected={connected}>
       <span className="dot" style={tint(colour ?? SCOPE_COLOUR[scope])} />
-      <span className="what">{name}<small>{detail}{connected ? "" : " · paused"}</small></span>
-      {onToggle && <Button onClick={onToggle}>{connected ? "Pause" : "Resume"}</Button>}
+      <span className="what">{name}<small>{detail}{paused ? " · paused" : ""}</small></span>
+      {onToggle && <Button onClick={onToggle}>{paused ? "Resume" : "Pause"}</Button>}
       {onRemove && <Button variant="danger" onClick={onRemove}>Remove</Button>}
     </div>
   );
+}
+
+/** Something a connection received: who it is from, when, and what was said. */
+export function Message({ who, when, children }: { who: string; when: string; children: ReactNode }) {
+  return <div className="message"><small>{who} · {when}</small>{children}</div>;
 }
 
 /** Asked before any connection is opened or closed. */
@@ -130,3 +194,5 @@ export function Alert({ kind, children }: { kind: keyof typeof ALERTS; children:
   const [colour, mark] = ALERTS[kind];
   return <div className="alert" role={kind === "error" ? "alert" : "status"} style={tint(colour)}><span className="icon" aria-hidden="true">{mark}</span>{children}</div>;
 }
+
+export { LeftSidebar, type SidebarItem, type SidebarFooterItem } from "./left-sidebar";

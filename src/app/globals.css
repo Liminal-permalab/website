@@ -13,6 +13,39 @@
     --text-read: 16px;
     --text-section: clamp(28px, 4.4vw, 42px);
     --text-hero: clamp(40px, 7.4vw, 76px);
+    /* how strong the sand grain is; 0 turns it off */
+    --grain-opacity: 0.28;
+  }
+  /* The website's own colours: the Mosaic Hub's (ui-shared/theme.css there). Warm charcoal, pale text and its
+     pastels, in place of the kit's dark theme. The elements and their shapes stay the kit's; only these values
+     differ from the app. The light theme is left as the kit has it. */
+  :root[data-theme="dark"] {
+    --bg: #242427;
+    --surface: color-mix(in srgb, #e4e4e4 5%, #242427);
+    --raised: color-mix(in srgb, #e4e4e4 9%, #242427);
+    --sunken: color-mix(in srgb, #000 18%, #242427);
+    --line: rgb(88, 91, 96);
+    --grey: rgb(100, 103, 108);
+    --fg: #e4e4e4;
+    --muted: #9a9a9a;
+
+    --mint: #b8e8d4; /* the Hub's "stays on this machine" */
+    --personal: #b8e8d4;
+    --interpersonal: #e8a3a3;
+    --collective: rgb(182, 216, 229); /* the Hub's accent */
+    --cloud: #e8d4b8; /* the Hub's sand: "leaves this machine" */
+    --success: #b8e8d4;
+    --warning: #e3d089;
+    --danger: #e08a8a;
+    --on-colour: #242427;
+    --placeholder: #7d7f85;
+    --error-text: #e8a3a3;
+    --label-bg: color-mix(in srgb, #2f2f33 90%, transparent);
+    --focus: color-mix(in srgb, var(--accent) 70%, #242427);
+  }
+  /* the homepage's drawing is wider than the window on purpose; it must not add a sideways scrollbar */
+  body {
+    overflow-x: clip;
   }
 }
 
@@ -35,6 +68,28 @@
   --shadow-2: var(--level-2);
   --shadow-3: var(--level-3);
   --shadow-pressed: var(--pressed);
+}
+
+/* The website's own page frame. (The kit's .shell is the app's fixed, full-window frame, so the website does not use it.) */
+@layer components {
+  .site {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: var(--space-3) max(var(--space-4), env(safe-area-inset-right, 0px)) var(--space-6) max(var(--space-4), env(safe-area-inset-left, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .site .topbar {
+    padding-inline: 0;
+  }
+  /* the kit's <main> is the app's scrolling content area; on the website the page itself scrolls */
+  .site > main {
+    display: block;
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+  }
 }
 
 /* What the website adds on top of the kit. Elements themselves are never restyled here. */
@@ -114,6 +169,315 @@
   }
 }
 
+/* Sand: a printed-paper grain over the whole page, background and interface alike. The same texture, at the same
+   strength, as the Mosaic Hub (ui-shared/components.css there). */
+body::after,
+.culture-hero[data-full="true"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 48px 48px;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+}
+
+/* The homepage: nothing but the text filling in, with the torus free on the page behind it. */
+@layer components {
+  .culture-hero {
+    position: relative;
+    /* as tall as the window less the bar above it, twice, so its middle is the middle of the window. The text
+       and, under it, the room for the torus form one group, centred there. */
+    min-height: calc(100svh - 180px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .culture-torus-space {
+    width: 100%;
+    height: clamp(240px, 36svh, 360px);
+    pointer-events: none;
+  }
+  .culture-hero[data-full="true"] .culture-torus-space {
+    display: none;
+  }
+  .torus-flow {
+    position: absolute;
+    /* wider than the page's column, so the waves run off the edges of the window instead of stopping at a frame */
+    inset: -40px calc(50% - 50vw) -80px;
+    width: 100vw;
+    height: calc(100% + 120px);
+    color: var(--fg);
+    /* it can be turned in every direction by dragging, with a mouse or a finger */
+    cursor: grab;
+    touch-action: none;
+    outline-offset: -6px;
+  }
+  /* on a touch screen, a swipe that starts on the text scrolls the page; one that starts on the torus turns it */
+  @media (pointer: coarse) {
+    .culture-hero .culture-text {
+      pointer-events: auto;
+    }
+  }
+  .torus-flow[data-held] {
+    cursor: grabbing;
+  }
+  .culture-text {
+    position: relative;
+    max-width: 56rem;
+    text-align: center;
+    /* the text lets a drag pass through to the torus behind it; its buttons still work */
+    pointer-events: none;
+  }
+  .culture-text a,
+  .culture-text button {
+    pointer-events: auto;
+  }
+  .culture-text .row {
+    justify-content: center;
+  }
+  .culture-controls {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  /* The full view: the torus alone, across the whole screen. */
+  .culture-hero[data-full="true"] {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    min-height: 0;
+    padding: 0;
+    background: var(--bg);
+  }
+  .culture-hero[data-full="true"] .culture-text {
+    display: none;
+  }
+  .culture-hero[data-full="true"] .torus-flow {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  .culture-hero[data-full="true"] .culture-controls {
+    right: var(--space-5);
+    bottom: var(--space-5);
+  }
+  .filling-title {
+    font-size: clamp(32px, 4.6vw, 56px);
+    color: var(--fg);
+  }
+  .filling-line {
+    font-size: clamp(17px, 1.5vw, 19px);
+    line-height: 1.5;
+    color: var(--fg);
+    max-width: 56rem;
+    margin-inline: auto;
+  }
+  .filling-cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: 0.95em;
+    margin-left: 0.08em;
+    vertical-align: -0.1em;
+    background: var(--accent);
+    animation: cursor-blink 1s step-end infinite;
+  }
+  .filling-after {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s, visibility 0s 0.6s;
+  }
+  .filling-after[data-shown="true"] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s;
+  }
+}
+/* The homepage as a story told by scrolling: one picture stays in place while the sections pass over it. */
+@layer components {
+  .story {
+    position: relative;
+  }
+  /* the picture: as tall as the window, held in place for as long as the story is on screen */
+  .story-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    margin-bottom: -100svh;
+  }
+  .story-stage canvas {
+    position: absolute;
+    top: 0;
+    /* as wide as the window, not as the page's column */
+    left: calc(50% - 50vw);
+    width: 100vw;
+    height: 100%;
+    color: var(--fg);
+    cursor: grab;
+    /* a sideways drag turns the tori; an up-and-down swipe still scrolls the page */
+    touch-action: pan-y;
+  }
+  .story-stage canvas[data-held] {
+    cursor: grabbing;
+  }
+  /* each section is one window tall, its words in the middle of it, as in the statement; a drag on it passes
+     through to the picture, its links still work */
+  .story-panel {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+  .story-panel a,
+  .story-panel button {
+    pointer-events: auto;
+  }
+  .story-statement {
+    /* the bar above the story already takes room, so the statement sits in the middle of what is left */
+    min-height: calc(100svh - 70px);
+    padding-top: 0;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .story-statement .filling-title {
+    max-width: 22ch;
+    margin-inline: auto;
+    font-size: clamp(28px, 4.6vw, 60px);
+  }
+  .story-statement .filling-line {
+    max-width: 34ch;
+    font-size: clamp(20px, 2.4vw, 30px);
+  }
+  .story-hint {
+    margin-top: var(--space-6);
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  .story-copy {
+    max-width: 30rem;
+    will-change: transform;
+    /* a soft halo of the page's colour around the letters, so they stay readable over the donuts behind them */
+    text-shadow: 0 0 4px var(--bg), 0 0 14px var(--bg), 0 0 30px var(--bg);
+  }
+  .story-number {
+    font: 700 var(--text-small) var(--font);
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+  .story-copy .read {
+    margin-top: var(--space-3);
+    color: var(--fg);
+  }
+  /* a gauge at the right edge: one dot per section, the one on screen filled in; each dot goes to its section */
+  .story-gauge {
+    position: fixed;
+    right: max(var(--space-2), env(safe-area-inset-right, 0px));
+    top: 50%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(-50%);
+  }
+  .story-gauge button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .story-gauge button::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    opacity: 0.55;
+    transition: width 0.2s, height 0.2s, background 0.2s, opacity 0.2s;
+  }
+  .story-gauge button[aria-current="step"]::before {
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    opacity: 1;
+  }
+  .story-gauge button:hover::before {
+    opacity: 1;
+  }
+  /* the arrow to the next section, at the foot of the window */
+  .story-next {
+    position: fixed;
+    left: 50%;
+    bottom: var(--space-4);
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: -22px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--raised);
+    color: var(--fg);
+    box-shadow: var(--level-2);
+    cursor: pointer;
+    animation: nudge 2.4s ease-in-out infinite;
+  }
+  .story-next:hover {
+    box-shadow: var(--level-3);
+  }
+  /* the closing statement: the biggest words on the page, centred */
+  .story-end {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    padding-top: 0;
+    text-align: center;
+  }
+  .story-closing {
+    max-width: 24ch;
+    font: 700 clamp(30px, 5.2vw, 70px) / 1.08 var(--font);
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    color: var(--fg);
+  }
+}
+/* (Each section locks into place when it is reached: that is done by the page's own scripting in CultureStory.tsx,
+   for the wheel, the keys, touch and the scrollbar alike, not by the browser's scroll snapping, which is not
+   dependable.) */
+@keyframes nudge {
+  50% {
+    translate: 0 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-next {
+    animation: none;
+  }
+}
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* The one page-load moment: the values in the map settle into place, one after another. */
 @keyframes node-in {
   from {
@@ -128,6 +492,12 @@
 @media (prefers-reduced-motion: reduce) {
   .flat-map .node {
     animation: none;
+  }
+  .filling-cursor {
+    animation: none;
+  }
+  .filling-after {
+    transition: none;
   }
   .btn {
     transition: none;

@@ -11,6 +11,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
     "@supabase/supabase-js": "^2.119.2",
     "next": "16.4.6",
     "permalab-ui": "file:./vendor/permalab-ui",

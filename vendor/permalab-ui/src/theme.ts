@@ -17,7 +17,7 @@ function stored(): Theme | null {
   }
 }
 
-export const getTheme = (): Theme => (document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+export const getTheme = (): Theme => (document.documentElement.dataset.theme === "light" ? "light" : "dark");
 
 export function setTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
@@ -29,16 +29,16 @@ export function setTheme(theme: Theme): void {
   listeners.forEach((l) => l());
 }
 
-/** Called once before the first drawing, so the page never flashes the wrong theme. Light unless dark was chosen. */
+/** Called once before the first drawing, so the page never flashes the wrong theme. Dark unless light was chosen. */
 export function applyStoredTheme(): void {
-  document.documentElement.dataset.theme = stored() ?? "light";
+  document.documentElement.dataset.theme = stored() ?? "dark";
 }
 
 const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
-export const useTheme = (): Theme => useSyncExternalStore(subscribe, getTheme, () => "light");
+export const useTheme = (): Theme => useSyncExternalStore(subscribe, getTheme, () => "dark");
 
 /** Colours the 3D maps need per theme (three.js cannot read the CSS tokens by itself). */
 export const MAP_INK: Record<Theme, { centre: string; project: string; paused: string }> = {

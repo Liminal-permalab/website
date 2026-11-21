@@ -11,7 +11,11 @@
     "./elements": "./src/elements.tsx",
     "./theme": "./src/theme.ts",
     "./theme-script": "./src/theme-script.ts",
-    "./scope": "./src/scope.ts"
+    "./scope": "./src/scope.ts",
+    "./colour": "./src/colour.ts",
+    "./colour-wheel": "./src/colour-wheel.tsx",
+    "./mosaic-mark": "./src/mosaic-mark.tsx",
+    "./left-sidebar": "./src/left-sidebar.tsx"
   },
   "peerDependencies": {
     "react": ">=19"

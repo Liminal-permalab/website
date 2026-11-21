@@ -33,12 +33,12 @@
 
   --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --text-caption: 12px;
-  --text-small: 13px;
-  --text-body: 15px;
-  --text-medium: 17px;
-  --text-heading: 22px;
-  --text-display: 34px;
+  --text-caption: 13px;
+  --text-small: 14px;
+  --text-body: 16px;
+  --text-medium: 19px;
+  --text-heading: 25px;
+  --text-display: 38px;
 
   --space-1: 4px;
   --space-2: 8px;

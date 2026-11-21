@@ -65,8 +65,8 @@ export default function UiPage() {
           <p>The local and cloud AI buttons sit on every screen of the app, dimmed until that AI is set up.</p>
         </Section>
         <Section title="Inputs">
-          <Field id="ui-text" label="Database address" placeholder="https://db.example.org" value={text} onChange={setText} />
-          <Field id="ui-secret" label="Access key" secret placeholder="Hidden while typing" value="" onChange={() => {}} />
+          <Field id="ui-text" label="Database address" hint="https://db.example.org" value={text} onChange={setText} />
+          <Field id="ui-secret" label="Access key" secret hint="Hidden while typing" value="" onChange={() => {}} />
           <Field id="ui-error" label="Folder" value="" error="Choose a folder to continue" onChange={() => {}} />
         </Section>
         <Section title="Chips, tags and scopes">
