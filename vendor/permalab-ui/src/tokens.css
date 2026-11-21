@@ -1,0 +1,91 @@
+/* Design tokens: every colour, font, size and shadow in the app comes from here.
+   The look is light, soft and raised: a warm off-white surface, mint as the primary, pill shapes, gentle shadows.
+   --accent is the member's own colour (setup step 8); it becomes the primary everywhere. */
+:root {
+  color-scheme: light;
+  --bg: #eeece7;
+  --surface: #f6f5f1;
+  --raised: #fbfaf7;
+  --sunken: #e6e3dd;
+  --line: #d9d6cf;
+  --grey: #b9b6b0;
+  --fg: #33322f;
+  --muted: #7b7873;
+
+  --mint: #9ee6c9;
+  --personal: #9ee6c9;
+  --interpersonal: #f3aa99;
+  --collective: #a7c4f2;
+  --cloud: #f2dc8c;
+  --success: #9ee6c9;
+  --warning: #f2dc8c;
+  --danger: #f09a96;
+  --accent: var(--mint);
+  /* text and icons that sit on a coloured surface (mint, coral, yellow…): dark in both themes */
+  --on-colour: #33322f;
+  --placeholder: #9b9892;
+  --error-text: #b4514c;
+  --label-bg: rgba(251, 250, 247, 0.86);
+  --scrim: rgba(51, 50, 47, 0.28);
+  /* how much of the accent a chosen option takes */
+  --chosen: 45%;
+  --focus: color-mix(in srgb, var(--accent) 70%, white);
+
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-caption: 12px;
+  --text-small: 13px;
+  --text-body: 15px;
+  --text-medium: 17px;
+  --text-heading: 22px;
+  --text-display: 34px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 28px;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* elevation: a light edge on top, a soft shadow underneath, deeper per level */
+  --edge: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --level-1: var(--edge), 0 1px 2px rgba(70, 62, 48, 0.1), 0 2px 6px rgba(70, 62, 48, 0.08);
+  --level-2: var(--edge), 0 2px 3px rgba(70, 62, 48, 0.1), 0 6px 14px rgba(70, 62, 48, 0.11);
+  --level-3: var(--edge), 0 3px 5px rgba(70, 62, 48, 0.11), 0 10px 22px rgba(70, 62, 48, 0.13);
+  --level-4: var(--edge), 0 4px 7px rgba(70, 62, 48, 0.12), 0 16px 30px rgba(70, 62, 48, 0.15);
+  --level-5: var(--edge), 0 6px 10px rgba(70, 62, 48, 0.13), 0 24px 44px rgba(70, 62, 48, 0.18);
+  --pressed: inset 0 2px 4px rgba(70, 62, 48, 0.16), inset 0 -1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* The dark theme: the same soft, raised shapes on warm charcoal. Only the neutrals and shadows change; the colours
+   of the spaces and the member's own accent stay as they are. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1a1917;
+  --surface: #23221f;
+  --raised: #2e2c28;
+  --sunken: #151412;
+  --line: #3b3934;
+  --grey: #5e5b55;
+  --fg: #efede7;
+  --muted: #a5a199;
+  --focus: color-mix(in srgb, var(--accent) 70%, #1a1917);
+  --placeholder: #77736c;
+  --error-text: #f2aaa6;
+  --label-bg: rgba(46, 44, 40, 0.9);
+  --scrim: rgba(0, 0, 0, 0.5);
+  --chosen: 26%;
+
+  --edge: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --level-1: var(--edge), 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --level-2: var(--edge), 0 2px 3px rgba(0, 0, 0, 0.35), 0 6px 14px rgba(0, 0, 0, 0.3);
+  --level-3: var(--edge), 0 3px 5px rgba(0, 0, 0, 0.38), 0 10px 22px rgba(0, 0, 0, 0.34);
+  --level-4: var(--edge), 0 4px 7px rgba(0, 0, 0, 0.4), 0 16px 30px rgba(0, 0, 0, 0.38);
+  --level-5: var(--edge), 0 6px 10px rgba(0, 0, 0, 0.42), 0 24px 44px rgba(0, 0, 0, 0.44);
+  --pressed: inset 0 2px 5px rgba(0, 0, 0, 0.55), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}

@@ -1,0 +1,19 @@
+{
+  "name": "permalab-ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The Permalab interface kit: tokens, styles and elements shared by the desktop app and the website.",
+  "sideEffects": ["*.css"],
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./styles.css": "./src/styles.css",
+    "./elements": "./src/elements.tsx",
+    "./theme": "./src/theme.ts",
+    "./theme-script": "./src/theme-script.ts",
+    "./scope": "./src/scope.ts"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  }
+}
